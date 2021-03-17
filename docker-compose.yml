@@ -6,49 +6,32 @@ services:
     image:  devopsansiblede/kstats:latest
     restart: always
     volumes:
-      - ${PWD}/kstats/env:/var/www/html/.env
-    labels:
-      traefik.enable: 'true'
-      traefik.http.services.appstore.loadbalancer.server.port: '80'
-      traefik.http.routers.appstore_http.rule: 'Host(`kstats.felixkazuya.de`)'
-      traefik.http.routers.appstore_http.entrypoints: 'web'
-      traefik.http.routers.appstore_http.middlewares: 'forcehttps@file'
-      traefik.http.routers.appstore.rule: 'Host(`kstats.felixkazuya.de`)'
-      traefik.http.routers.appstore.entrypoints: 'websecure'
-      traefik.http.routers.appstore.tls: 'true'
-      traefik.http.routers.appstore.tls.certresolver: 'letsencrypt'
-      traefik.http.routers.appstore.tls.domains[0].main: 'felixkazuya.de'
-      traefik.http.routers.appstore.tls.domains[0].sans: '*.felixkazuya.de'
+      - ${PWD}/.env:/var/www/html/.env
     networks:
       - backbone
       - database
     environment:
-      - APACHE_WORKDIR: /var/www/html/public/
+      - "APACHE_WORKDIR=/var/www/html/public/"
+
+    ports:
+      - 8080:80
 
   kstats_db:
     container_name: kstats_db
     restart: always
     image: mariadb:latest
     environment:
-      MYSQL_ROOT_PASSWORD: mybb
-      MYSQL_DATABASE: mybb
-      MYSQL_USER: mybb
-      MYSQL_PASSWORD: changeme
+      MYSQL_ROOT_PASSWORD: kstatskstatskstats
+      MYSQL_DATABASE: kstats
+      MYSQL_USER: kstats
+      MYSQL_PASSWORD: kstatskstatskstats
     networks:
       - database
     volumes:
      - ${PWD}/mariadb:/var/lib/mysql
-
-    volumes:
-      - /mnt/shared/applications/appstore/ssh/authorized_keys:/root/.ssh/authorized_keys
-      - /mnt/shared/applications/appstore/data:/var/www/html
-    labels:
-      traefik.enable: false
     networks:
-      - backbone
-    ports:
-      - "50022:22"
-    
+      - database
+
 
 networks:
   frontend:
